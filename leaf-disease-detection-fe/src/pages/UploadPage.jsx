@@ -9,10 +9,19 @@ export default function UploadPage() {
 
     const handleUpload = async (e) => {
         e.preventDefault();
-        redirect("/result");
 
         if (!image) return alert("Hãy chọn ảnh trước!");
+        redirect("/result");
 
+        const mockData = {
+            label: "Khỏe mạnh",
+            confidence: 0.9545,
+        };
+
+        // 2. Chuyển hướng sang trang kết quả với dữ liệu giả lập
+        navigate("/result", {
+            state: { data: mockData, image: URL.createObjectURL(image) },
+        });
         const formData = new FormData();
         formData.append("file", image);
 
