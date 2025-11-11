@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 import { Button } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 
@@ -9,27 +9,29 @@ export default function UploadPage() {
 
     const handleUpload = async (e) => {
         e.preventDefault();
+        redirect("/result");
+
         if (!image) return alert("Hãy chọn ảnh trước!");
 
         const formData = new FormData();
         formData.append("file", image);
 
-        try {
-            const res = await fetch("http://localhost:3001/predict", {
-                method: "POST",
-                body: formData,
-            });
+        // try {
+        //     const res = await fetch("http://localhost:3001/predict", {
+        //         method: "POST",
+        //         body: formData,
+        //     });
 
-            if (!res.ok) throw new Error("Upload thất bại!");
+        //     if (!res.ok) throw new Error("Upload thất bại!");
 
-            const data = await res.json();
-            navigate("/result", {
-                state: { data, image: URL.createObjectURL(image) },
-            });
-        } catch (error) {
-            console.error(error);
-            alert("Có lỗi khi upload ảnh!");
-        }
+        //     const data = await res.json();
+        //     navigate("/result", {
+        //         state: { data, image: URL.createObjectURL(image) },
+        //     });
+        // } catch (error) {
+        //     console.error(error);
+        //     alert("Có lỗi khi upload ảnh!");
+        // }
     };
 
     return (
