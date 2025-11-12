@@ -1,5 +1,4 @@
-const API_URL = 'http://127.0.0.1:5173/predict';
-
+const API_URL = process.env.API_URL
 export const predictImage = async (imageFile) => {
     if (!imageFile) {
         throw new Error("Vui lòng chọn một tệp ảnh để dự đoán.");
