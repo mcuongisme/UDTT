@@ -4,24 +4,18 @@ from PIL import Image
 from flask import Flask, request, jsonify
 from flask_cors import CORS # Thư viện để xử lý CORS
 from tensorflow.keras.models import load_model
-import tempfile
+import temp_files
 # --- KHỞI TẠO VÀ CẤU HÌNH ---
 app = Flask(__name__)
 CORS(app) 
 
-MODEL_PATH = 'model.h5'
+MODEL_PATH = 'corn_leaf_model.h5'
 IMG_HEIGHT, IMG_WIDTH = 150, 150
 CLASS_NAMES = [
-    'guava_diseased',
-    'guava_healthy',
-    'jamun_diseased',
-    'jamun_healthy',
-    'lemon_diseased',
-    'lemon_healthy',
-    'mango_diseased',
-    'mango_healthy',
-    'pomegranate_diseased',
-    'pomegranate_healthy'
+    'chay-la',   # Leaf Blight
+    'dom-la',    # Spot
+    'gi-sat',    # Rust
+    'khoe-manh'  # Healthy
 ]
 try:
     model = load_model(MODEL_PATH)
@@ -87,5 +81,5 @@ def predict():
 
 # --- CHẠY SERVER ---
 if __name__ == '__main__':
-    # Chạy server trên cổng 5000 (React thường chạy trên 3000)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Chạy server trên cổng 5173
+    app.run(debug=True, host='0.0.0.0', port=5173)
