@@ -2,20 +2,22 @@ import os
 import numpy as np
 from PIL import Image
 from flask import Flask, request, jsonify
-from flask_cors import CORS # Thư viện để xử lý CORS
+from flask_cors import CORS 
 from tensorflow.keras.models import load_model
-import temp_files
-# --- KHỞI TẠO VÀ CẤU HÌNH ---
+import tempfile 
+
 app = Flask(__name__)
 CORS(app) 
 
-MODEL_PATH = 'corn_leaf_model.h5'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__)) 
+MODEL_PATH = os.path.join(BASE_DIR, 'corn_leaf_model.h5') 
+
 IMG_HEIGHT, IMG_WIDTH = 150, 150
 CLASS_NAMES = [
-    'chay-la',   # Leaf Blight
-    'dom-la',    # Spot
-    'gi-sat',    # Rust
-    'khoe-manh'  # Healthy
+    'chay-la', 
+    'dom-la', 
+    'gi-sat', 
+    'khoe-manh'
 ]
 try:
     model = load_model(MODEL_PATH)
@@ -30,12 +32,11 @@ def preprocess_image(file_path):
     img = Image.open(file_path).convert('RGB')
     img = img.resize((IMG_HEIGHT, IMG_WIDTH))
     img_array = np.array(img)
-    img_array = np.expand_dims(img_array, axis=0) # Thêm chiều batch
-    # Chuẩn hóa - PHẢI KHỚP VỚI CÁCH BẠN TRAINING
+    img_array = np.expand_dims(img_array, axis=0) 
     img_array = img_array / 255.0 
     return img_array
 
-# --- API ENDPOINT ---
+# --- API ENDPOINT (ĐÃ SỬA DÙNG TEMPFİLE) ---
 @app.route('/predict', methods=['POST'])
 def predict():
     if model is None:
@@ -48,38 +49,39 @@ def predict():
     if file.filename == '':
         return jsonify({'error': 'Tên file trống.'}), 400
 
-    # Lưu file tạm thời để xử lý
-    file_path = f"temp_{file.filename}"
-    file.save(file_path)
-
+    temp_path = None
     try:
-        # 1. Tiền xử lý
-        processed_img = preprocess_image(file_path)
+        # 1. Lưu file tạm thời an toàn
+        with tempfile.NamedTemporaryFile(delete=False) as temp:
+            file.save(temp.name)
+            temp_path = temp.name 
         
-        # 2. Dự đoán
+        # 2. Tiền xử lý
+        processed_img = preprocess_image(temp_path)
+        
+        # 3. Dự đoán
         predictions = model.predict(processed_img)
         
-        # 3. Lấy kết quả
+        # 4. Lấy kết quả
         predicted_index = np.argmax(predictions[0])
         predicted_name = CLASS_NAMES[predicted_index]
         confidence = float(np.max(predictions[0])) * 100
-        
-        # 4. Xóa file tạm và trả về
-        os.remove(file_path)
         
         return jsonify({
             'prediction': predicted_name,
             'confidence': f'{confidence:.2f}%',
             'details': predictions[0].tolist() 
         })
+        
     except Exception as e:
-        # Đảm bảo file tạm bị xóa ngay cả khi có lỗi
-        if os.path.exists(file_path):
-             os.remove(file_path)
         return jsonify({'error': f'Lỗi xử lý dự đoán: {str(e)}'}), 500
+        
+    finally:
+        # Đảm bảo file tạm bị xóa
+        if temp_path and os.path.exists(temp_path):
+            os.remove(temp_path)
 
 
-# --- CHẠY SERVER ---
+# --- CHẠY SERVER (Chỉ dùng cho cục bộ) ---
 if __name__ == '__main__':
-    # Chạy server trên cổng 5173
-    app.run(debug=True, host='0.0.0.0', port=5173)
+    app.run(debug=False, host='0.0.0.0', port=5173)
