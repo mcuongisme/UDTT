@@ -103,6 +103,10 @@ export default function ResultPage() {
                             </>
                         ) : (
                             <div className="p-8 rounded-2xl bg-red-900/50 shadow-inner border border-red-500/50 text-center">
+                                <p className="text-lg font-semibold text-gray-300 mb-2">Tình trạng lá:</p>
+                                <h2 className="text-3xl md:text-4xl font-black text-red-400 mb-3">
+                                    {displayLabel}
+                                </h2>
                                 <p className="text-xl font-bold text-red-300 mb-3">
                                     Độ tin cậy quá thấp ({confidenceDisplay}%)
                                 </p>
