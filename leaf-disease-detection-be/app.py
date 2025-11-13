@@ -15,7 +15,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 MODEL_PATHS = {
     'corn': os.path.join(BASE_DIR, 'corn_leaf_model.h5'),
-    'mango': os.path.join(BASE_DIR, 'mango_leaf_model.h5')  # <-- Thay tên file model xoài
+    'mango': os.path.join(BASE_DIR, 'mango_leaf_model.h5') 
 }
 
 IMG_HEIGHT, IMG_WIDTH = 150, 150

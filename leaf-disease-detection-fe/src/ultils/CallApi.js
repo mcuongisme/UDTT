@@ -1,5 +1,5 @@
 export const predictImage = async (imageFile, leafType) => {
-    const API_URL = "http://192.168.1.10:5173/predict";
+    const API_URL = import.meta.env.VITE_API_URL
     if (!imageFile) {
         throw new Error("Vui lòng chọn một tệp ảnh để dự đoán.");
     }
